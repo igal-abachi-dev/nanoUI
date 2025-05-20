@@ -1,11 +1,14 @@
 import typescript from '@rollup/plugin-typescript';
 import dts from 'rollup-plugin-dts';
-import { terser } from '@rollup/plugin-terser';
+import terser from '@rollup/plugin-terser';
 import nodeResolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import path from 'node:path';
-import pkg from './package.json' assert { type: 'json' };
+
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const pkg = require('./package.json');
 
 const normalize = (p) => path.posix.normalize(p);
 const external = [
@@ -35,8 +38,6 @@ export default [
       json(),
       typescript({
         tsconfig: './tsconfig.json',
-        declaration: false,
-        emitDeclarationOnly: false,
         target: 'ES2020'
       }),
       terser()
