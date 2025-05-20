@@ -16,24 +16,33 @@ const external = [
   ...Object.keys(pkg.peerDependencies || {})
 ];
 
+const name = 'NanoUI'; // your global var
+
 export default [
   {
     input: normalize('src/index.ts'),
     output: [
       {
-        file: normalize('dist/index.cjs.js'),
-        format: 'cjs',
-        sourcemap: true
+        file: normalize('dist/nanoui.umd.min.js'),
+        format: 'umd',
+        name, // exposes window.NanoUI
+        sourcemap: true,
+        globals: {}
       },
       {
-        file: normalize('dist/index.esm.js'),
+        file: normalize('dist/nanoui.esm.js'),
         format: 'esm',
-        sourcemap: true
+        sourcemap: true,
+      },
+      {
+        file: 'dist/nanoui.cjs.js',
+        format: 'cjs',
+        sourcemap: true,
+        exports: 'auto'
       }
     ],
-    external,
     plugins: [
-      nodeResolve({ preferBuiltins: true }),
+      nodeResolve({ browser: true }),
       commonjs(),
       json(),
       typescript({
@@ -41,12 +50,13 @@ export default [
         target: 'ES2020'
       }),
       terser()
-    ]
+    ],
+    external
   },
   {
     input: normalize('dist/types/index.d.ts'),
     output: {
-      file: normalize('dist/index.d.ts'),
+      file: normalize('dist/nanoui.d.ts'),
       format: 'es'
     },
     plugins: [dts()]

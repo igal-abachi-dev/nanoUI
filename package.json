@@ -2,14 +2,17 @@
   "name": "nanoui",
   "version": "1.0.0",
   "description": "nanoUI SPA utility library",
-  "main": "dist/index.cjs.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/nanoui.cjs.js",
+  "module": "dist/nanoui.esm.js",  
+  "unpkg": "dist/nanoui.umd.min.js",
+  "jsdelivr": "dist/nanoui.umd.min.js",
+  "types": "dist/nanoui.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/index.cjs.js",
-      "import": "./dist/index.esm.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/nanoui.cjs.js",
+      "import": "./dist/nanoui.esm.js",
+      "types": "./dist/nanoui.d.ts",
+      "default": "./dist/nanoui.umd.min.js"
     }
   },
   "files": [
