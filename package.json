@@ -1,0 +1,43 @@
+{
+  "name": "nanoui",
+  "version": "1.0.0",
+  "description": "nanoUI SPA utility library",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs.js",
+      "import": "./dist/index.esm.js",
+      "types": "./dist/index.d.ts"
+    },
+  "files": ["dist"],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "npm run clean && rollup -c",
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/igal-abachi-dev/nanoUI.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "bugs": {
+    "url": "https://github.com/igal-abachi-dev/nanoUI/issues"
+  },
+  "homepage": "https://github.com/igal-abachi-dev/nanoUI#readme",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^28.0.3",
+    "@rollup/plugin-json": "^6.1.0",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.1.2",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.41.0",
+    "rollup-plugin-dts": "^6.2.1",
+    "typescript": "^5.8.3"
+  }
+}
