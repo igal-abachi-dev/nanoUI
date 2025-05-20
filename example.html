@@ -1,0 +1,17 @@
+<script src="https://cdn.jsdelivr.net/npm/nanoui@1.0.0/dist/nanoui.umd.min.js"></script>
+<script>
+  // You can now use NanoUI.signal, NanoUI.createRouter, etc.
+
+  function Home() {
+    return {
+      html: `<h1>Hello from NanoUI!</h1>`
+    };
+  }
+
+  const routes = [
+    { path: "/", render: Home },
+    // more...
+  ];
+
+  NanoUI.createRouter({ routes, rootSelector: "#content" });
+</script>
