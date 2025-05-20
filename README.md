@@ -4,6 +4,10 @@
 
 ---
 
+```html
+import { signal, mountComponent, bootComponents, createRouter } from 'nanoui';
+```
+
 ### **CDN (Global UMD):**
 
 ```html
