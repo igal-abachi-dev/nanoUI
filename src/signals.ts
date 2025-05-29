@@ -14,13 +14,13 @@ export function batch(fn: () => void): void {
 }
 
 /* ---------- core types ---------- */
-type Subscriber = (() => void) & { deps?: Set<Signal<any>> };
+type Subscriber = (() => void) & { deps?: Set<signal<any>> };
 let active: Subscriber | null = null;
 
 type CleanupFn = () => void;
 
 /* ---------- Signal ---------- */
-export class Signal<T> {
+export class signal<T> {
   private subs = new Set<Subscriber>();
   private _version = 0;
   constructor(private _v: T) {}
@@ -118,7 +118,7 @@ function untrack<T>(fn: () => T): T {
 
 export function computed<T>(fn: () => T): ReadonlySignal<T> {
   let computing = false;
-  const out = new Signal<T>(untrack(fn)); // initialize with first value!
+  const out = new signal<T>(untrack(fn)); // initialize with first value!
   effect(() => {
     if (computing) throw new Error("Cycle detected in computed!");
     computing = true;
