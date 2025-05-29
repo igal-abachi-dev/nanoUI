@@ -8,6 +8,39 @@
 import {createRouter,signal,batch,computed,effect} from 'nanoui';
 ```
 
+## ✨ Features
+
+* **SPA Router:**
+  Full support for component-based route definitions, dynamic params, `loader`/`action`/`errorComponent`, and navigation interception.
+* **Signal System:**
+  Fine-grained reactivity for field/state management.
+* **DOM Batcher:**
+  Efficient microtask flush/batch rendering.
+* **Directives:**
+  Support for `[x-show]`, `@event`, and template interpolation (`{{ }}`).
+* **Lifecycle:**
+  Route-level `onMount` and automatic cleanup.
+* **Prefetch, Error Boundaries, Navigation State:**
+  Advanced features for robust SPAs.
+
+---
+
+## 🗂️ File Structure
+
+```
+src/
+  router.ts              # Main SPA router implementation
+  signals.ts             # Core signal system (reactivity)
+  directives.ts          # Directives and template binding
+  microtaskBatcher.ts    # DOM batching scheduler
+
+package.json             # Library/package manifest
+rollup.config.mjs        # Rollup bundler config (UMD, ESM)
+tsconfig.json            # TypeScript config
+```
+
+---
+
 ### **CDN import (Global UMD):**
 
 ```html

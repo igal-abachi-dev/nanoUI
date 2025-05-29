@@ -21,8 +21,8 @@ export function initDirectives(root: Element, ctx: Record<string, any>) {
     });
   });
   // v-show
-  root.querySelectorAll<HTMLElement>("[v-show]").forEach((el) => {
-    const expr = el.getAttribute("v-show")!;
+  root.querySelectorAll<HTMLElement>("[x-show]").forEach((el) => {
+    const expr = el.getAttribute("x-show")!;
     const update = () => {
       el.style.display = ctx[expr]?.() ? "" : "none";
     };
@@ -39,12 +39,23 @@ export function initDirectives(root: Element, ctx: Record<string, any>) {
       }
     });
   });
-  // Mustache {{ expr }}
-  root.querySelectorAll<HTMLElement>("*").forEach((el) => {
-    el.innerHTML = el.innerHTML.replace(/{{\s*([\w\d_]+)\s*}}/g, (_, expr) => {
-      if (typeof ctx[expr] === "function") return ctx[expr]();
-      if (ctx[expr] !== undefined) return ctx[expr];
-      return "";
+
+  // Mustache {{ expr }} with dot notation
+  root.querySelectorAll("*").forEach((el) => {
+    el.innerHTML = el.innerHTML.replace(/{{\s*([\w\d_.]+)\s*}}/g, (_, expr) => {
+      const val = getVal(ctx, expr);
+      return typeof val === "function" ? val() : val ?? "";
     });
   });
+}
+
+// Utility: safely resolve dot notation (e.g., "user.name.first")
+function getVal(ctx: Record<string, any>, expr: string) {
+  return expr
+    .split(".")
+    .reduce(
+      (acc: any, key: string) =>
+        (typeof acc === "function" ? acc() : acc)?.[key],
+      ctx
+    );
 }
