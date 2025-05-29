@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NanoUI Example</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module">
+      import { createRouter } from "https://cdn.jsdelivr.net/npm/nanoui@1.0.0/dist/nanoui.esm.js";
+      createRouter({
+        routes: [
+          { path: "/", component: (await import("./HomePage.js")).HomePage },
+          { path: "/user/:id", component: (await import("./UserProfile.js")).UserProfile }
+        ]
+      });
+    </script>
+  </body>
+</html>
