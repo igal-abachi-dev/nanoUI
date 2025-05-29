@@ -3,24 +3,26 @@
 **nanoUI** is a fast, minimal SPA utility library for modern small/simple web sites and landing pages
 
 ---
+
 ### **nano UI exports:**
+
 ```html
 import {createRouter,signal,batch,computed,effect} from 'nanoui';
 ```
 
 ## ✨ Features
 
-* **SPA Router:**
+- **SPA Router:**
   Full support for component-based route definitions, dynamic params, `loader`/`action`/`errorComponent`, and navigation interception.
-* **Signal System:**
+- **Signal System:**
   Fine-grained reactivity for field/state management.
-* **DOM Batcher:**
+- **DOM Batcher:**
   Efficient microtask flush/batch rendering.
-* **Directives:**
+- **Directives:**
   Support for `[x-show]`, `@event`, and template interpolation (`{{ }}`).
-* **Lifecycle:**
+- **Lifecycle:**
   Route-level `onMount` and automatic cleanup.
-* **Prefetch, Error Boundaries, Navigation State:**
+- **Prefetch, Error Boundaries, Navigation State:**
   Advanced features for robust SPAs.
 
 ---
@@ -41,28 +43,53 @@ tsconfig.json            # TypeScript config
 
 ---
 
+### **SPA Router**
+
+```html
+<body>
+  <div id="root"></div>
+  <script type="module">
+    import { createRouter } from "https://cdn.jsdelivr.net/npm/nanoui@1.0.0/dist/nanoui.esm.js";
+    createRouter({
+      routes: [
+        { path: "/", component: (await import("./HomePage.js")).HomePage },
+        { path: "/user/:id", component: (await import("./UserProfile.js")).UserProfile },
+      ],
+    });
+  </script>
+</body>
+
+<script>
+  export const HomePage = {
+  render: () => ({
+    html: `<h1>Welcome!</h1>`
+  })
+</script>
+};
+```
 
 ### **lightweight signals**
+
 ```html
 <script>
-const count = new signal(0);
-const double = computed(() => count.value * 2);
+  const count = new signal(0);
+  const double = computed(() => count.value * 2);
 
-effect(() => {
-  console.log("double is", double.value);
-});
+  effect(() => {
+    console.log("double is", double.value);
+  });
 
-function reRun() {
-  count.value++;
-}
+  function reRun() {
+    count.value++;
+  }
 
-const a = new signal(1);
-const b = new signal(2);
-const sum = computed(() => a.value + b.value);
+  const a = new signal(1);
+  const b = new signal(2);
+  const sum = computed(() => a.value + b.value);
 
-effect(() => console.log("Sum:", sum.value)); // Logs: Sum: 3
-a.value = 5; // Logs: Sum: 7
-b.value = 3; // Logs: Sum: 8
+  effect(() => console.log("Sum:", sum.value)); // Logs: Sum: 3
+  a.value = 5; // Logs: Sum: 7
+  b.value = 3; // Logs: Sum: 8
 </script>
 ```
 
@@ -73,7 +100,7 @@ b.value = 3; // Logs: Sum: 8
 ```html
 <script src="https://cdn.jsdelivr.net/npm/nanoui@1.0.0/dist/nanoui.umd.min.js"></script>
 <script>
-  NanoUI.greet('World');
+  NanoUI.greet("World");
 </script>
 ```
 
@@ -81,7 +108,7 @@ b.value = 3; // Logs: Sum: 8
 
 ```html
 <script type="module">
-  import { greet } from 'https://cdn.jsdelivr.net/npm/nanoui@1.0.0/dist/nanoui.esm.js';
-  greet('World');
+  import { greet } from "https://cdn.jsdelivr.net/npm/nanoui@1.0.0/dist/nanoui.esm.js";
+  greet("World");
 </script>
 ```
