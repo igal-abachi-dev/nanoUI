@@ -2,6 +2,8 @@ function capitalize(str: string): string {
   return str[0].toUpperCase() + str.slice(1);
 }
 
+//missing functionality , shared layout component between routes , nested components , nested routes
+
 //todo , mount cleanup weakmap registry , return code , instead of v-model usage
 //for render route
 
