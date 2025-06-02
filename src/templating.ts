@@ -62,6 +62,8 @@ export function html(strings: TemplateStringsArray, ...values: Array<string | Te
     }
   });
 
+
+  //Future: You may want to add DOM diffing or support for reactive signals (currently static).
   return {
     html: out,
     onMount: () => {
@@ -85,6 +87,8 @@ The regex approach works but has limitations:
 // Current: only self-closing components
 /<([A-Z]\w*)([^>]*)\/>/g
 
+
+Does not support <Comp>children</Comp> or dynamic attributes yet.
 // Consider supporting:
 // <Component>children</Component>
 // <Component attr={value} />
@@ -112,6 +116,10 @@ export function stringToDom(html: string): Element | null {
   const tpl = document.createElement("template");
   tpl.innerHTML = html.trim();
   return tpl.content.firstElementChild;//.content?
+
+
+
+//No DocumentFragment support yet in stringToDom, so your current implementation is safe.
 }
 
 export function compileJSXRuntime(root: HTMLElement, componentMap: Record<string, Component> = {}): void {
