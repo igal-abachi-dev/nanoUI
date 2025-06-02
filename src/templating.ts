@@ -4,6 +4,11 @@ interface Component {
   render: (data?: any, action?: any, params?: Record<string, any>) => TemplateResult;
 }
 
+// interface TypedComponent<P = {}> {
+//   render: (data?: any, action?: any, params?: P) => TemplateResult;
+//   propTypes?: Record<keyof P, any>; // For runtime validation
+// }
+
 // Template result interface
 interface TemplateResult {
   html: string;
@@ -24,13 +29,18 @@ export function h(comp: Component,
   // If you need params later you can extend this signature.
   return comp.render(undefined,undefined, params);
 }
+//Limited templating - No loops, conditionals beyond x-show, or components
+//No component system - Just page-level components in the router
+/* interesting micro-framework that strikes a balance between functionality and size, though you'd need to be careful about XSS vulnerabilities with the innerHTML usage. */
 
-const escapeHtml = (s: string) =>
-  s.replace(/[&<>"']/g, (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]!)
-  );
 
-// template.js
+  function escapeHtml(s:string) {
+    return s.replace(/[&<>"']/g, c =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c] || c)
+    );
+  }
+
+// Base template literal function
 export function html(strings: TemplateStringsArray, ...values: Array<string | TemplateResult | null | undefined>): TemplateResult {
   let out = "";
   const mounts: Array<() => (() => void) | void> = [];
@@ -40,13 +50,11 @@ export function html(strings: TemplateStringsArray, ...values: Array<string | Te
     if (i < values.length) {
       const v = values[i];
       if (v && typeof (v as TemplateResult).html === "string") {
-        // v is a { html, onMount } object
         out += (v as TemplateResult).html;
         if (typeof (v as TemplateResult).onMount === "function") {
           mounts.push((v as TemplateResult).onMount!);
         }
       } else if (typeof v === "string") {
-        // Escape plain strings for safety
         out += escapeHtml(v);
       } else {
         out += String(v ?? "");
@@ -62,6 +70,109 @@ export function html(strings: TemplateStringsArray, ...values: Array<string | Te
     }
   };
 }
+
+// Create a component-aware version of html
+export function htmlWithComponents(components: Record<string, Component>) {
+  function componentHtml(strings: TemplateStringsArray, ...values: Array<string | TemplateResult | null | undefined>): TemplateResult {
+    let raw = "";
+    strings.forEach((str: string, i: number) => {
+      raw += str;
+      if (i < values.length) raw += String(values[i] ?? "");
+    });
+
+    /*Component Discovery in htmlWithComponents
+The regex approach works but has limitations:
+// Current: only self-closing components
+/<([A-Z]\w*)([^>]*)\/>/g
+
+// Consider supporting:
+// <Component>children</Component>
+// <Component attr={value} />
+ */
+    raw = raw.replace(/<([A-Z]\w*)([^>]*)\/>/g, (_, name: string, attrs: string) => {
+      const Comp = components[name];
+      if (!Comp) throw new Error(`Component "${name}" not found`);
+      const props: Record<string, string> = {};
+      attrs.trim().replace(/(\w+)="([^"]*)"/g, (_a: string, k: string, v: string) => {
+        props[k] = v;
+        return '';
+      });
+      const res = h(Comp, props);
+      return res.html; // If you want full lifecycle, you should accumulate res.onMounts too.
+    });
+
+    const templateArray = Object.assign([raw], { raw: [raw] });
+    return html(templateArray);
+  }
+  return componentHtml;
+}
+
+// Utility to convert string to DOM fragment
+export function stringToDom(html: string): Element | null {
+  const tpl = document.createElement("template");
+  tpl.innerHTML = html.trim();
+  return tpl.content.firstElementChild;//.content?
+}
+
+export function compileJSXRuntime(root: HTMLElement, componentMap: Record<string, Component> = {}): void {
+  root.querySelectorAll("*").forEach(el => {
+    const tag = el.tagName;
+    if (!/^[A-Z]/.test(tag)) return;
+
+    const comp = componentMap[tag] || componentMap[tag[0] + tag.slice(1).toLowerCase()];
+    if (!comp?.render) return;
+
+    const props: Record<string, any> = {};
+    for (const attr of el.attributes) {
+      props[attr.name] = attr.value;
+    }
+
+    const result = h(comp, props);
+    const fragment = stringToDom(result.html);
+    if (!fragment) return;
+/*
+The compileJSXRuntime function does a lot of DOM manipulation. Consider:
+
+Batching DOM updates
+Caching compiled components
+Using DocumentFragment for multiple replacements
+ */
+
+
+    // Recursively compile children
+    compileJSXRuntime(fragment as HTMLElement, componentMap);
+
+    // Replace <MyComponent> with the new DOM nodes
+    if (fragment.nodeType === Node.DOCUMENT_FRAGMENT_NODE) {
+      // Replace with all children
+      el.replaceWith(...fragment.childNodes);
+    } else {
+      // Replace with single node
+      el.replaceWith(fragment);
+    }
+
+    result.onMount?.();
+  });
+}
+
+// export function map<T>(items: T[], fn: (item: T, index: number) => TemplateResult): TemplateResult {
+//   const results = items.map(fn);
+//   return {
+//     html: results.map(r => r.html).join(''),
+//     onMount: () => {
+//       const cleanups = results.map(r => r.onMount?.()).filter(Boolean);
+//       return () => cleanups.forEach(c => c?.());
+//     }
+//   };
+//}
+
+// Usage: html`${map(users, user => html`<li>${user.name}</li>`)}`
+
+// export function when(condition: boolean, template: () => TemplateResult): TemplateResult {
+//   return condition ? template() : { html: '', onMount: () => {} };
+// }
+
+// Usage: html`${when(isLoggedIn, () => html`<Dashboard />`)}`
 
 /*
 import { h } from "./h.js";
@@ -81,6 +192,23 @@ export const HomePage: Component = {
   `
 };
 
+const counter = new NanoUI.signal(0);
+
+const route = {
+  path: '/counter',
+  component: {
+    render: () => ({
+      html: `
+        <h1>Count: {{ count }}</h1>
+        <button @click="increment">+</button>
+        <input v-model="count" type="number">
+      `,
+      count: counter,
+      setCount: (v) => counter.value = v,
+      increment: () => counter.value++
+    })
+  }
+};
 
 
 // And a child component
